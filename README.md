@@ -6,7 +6,8 @@ so the café can update the menu, hours, posts, photos and reviews without touch
 - **Site:** Next.js 16 (App Router), GSAP ScrollTrigger + Lenis for the walk-in hero, hand-written CSS
 - **Admin / content:** Payload CMS 3, running inside the same Next.js app at `/admin`
 - **Database:** SQLite file locally; any libSQL/Turso database in production
-- **Images:** resized automatically by Payload (`sharp`) into WebP sizes; stored on disk locally or in Vercel Blob
+- **Images:** resized automatically by Payload (`sharp`) into WebP sizes; stored on disk locally, or in Vercel Blob
+  in production (`src/storage/vercelBlob.ts`)
 
 ---
 
@@ -74,29 +75,26 @@ Everything is configured for Vercel. `vercel.json` makes each deploy apply datab
 build. `.vercelignore` keeps `.env`, the local database and local uploads from ever being uploaded.
 Run the commands from inside `handworks-site/`.
 
-1. **Log in to Vercel** (opens your browser):
-   ```bash
-   npx vercel@latest login
-   ```
-2. **Create the project:**
-   ```bash
-   npx vercel@latest link --yes --project handworks-coffee
-   ```
-3. **Add the database and image storage.** In the Vercel dashboard, open the **handworks-coffee** project,
-   then **Storage**:
-   - **Create → Turso** (from the Marketplace, free plan). Connect it to the project for all environments.
-     This sets `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
-   - **Create → Blob.** Connect it to the project. This sets `BLOB_READ_WRITE_TOKEN`.
-4. **Add the login secret.** In Project → Settings → Environment Variables, add `PAYLOAD_SECRET` for
-   Production and Preview. Use a long random value that is different from your local one. You can generate
-   one with:
+The live site is the Vercel project **handworkscoffe.com**. It's connected to the GitHub repo, so **every push
+to `main` deploys automatically**. Don't use "Add New Project → Import" again: that creates a second, empty
+project whose builds fail with "missing secret key".
+
+Setting it up from scratch:
+
+1. **Project:** in Vercel, **Add New → Project → Import** the GitHub repo, once only.
+2. **Database:** in **Storage → Create → Turso** (free plan), connect it to the project for Production and
+   Preview. Depending on the prefix you choose, it sets `TURSO_DATABASE_URL` plus `TURSO_AUTH_TOKEN` (or
+   `TURSO_DATABASE_TURSO_AUTH_TOKEN`). The site accepts either.
+3. **Images:** in **Storage → Create → Blob** (Private is fine), connect it to the project. This sets
+   `BLOB_STORE_ID`. New Vercel stores sign in automatically (OIDC) and no longer create a
+   `BLOB_READ_WRITE_TOKEN`; `src/storage/vercelBlob.ts` handles that. Photo uploads are limited to 4.4 MB,
+   Vercel's per-request limit, and most phone photos fit.
+4. **Login secret:** in **Settings → Environment Variables**, add `PAYLOAD_SECRET` for Production and Preview,
+   marked Sensitive. Use a long random value, which you can generate with:
    ```bash
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
-5. **Deploy:**
-   ```bash
-   npx vercel@latest deploy --prod
-   ```
+5. **Deploy:** push to `main`, or press **Redeploy** on the latest deployment.
 6. **Create the admin account straight away** at `https://<your-site>/admin`. The first visitor gets the
    "create first user" form.
 7. **Load the starter content.** On the admin dashboard of a fresh site, press **Load starter content**.

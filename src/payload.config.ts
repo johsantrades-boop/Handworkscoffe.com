@@ -1,6 +1,5 @@
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -16,6 +15,7 @@ import { Users } from './collections/Users'
 import { Announcement } from './globals/Announcement'
 import { BusinessInfo } from './globals/BusinessInfo'
 import { Story } from './globals/Story'
+import { vercelBlobStorage } from './storage/vercelBlob'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -50,22 +50,17 @@ export default buildConfig({
     // Local file in development; Turso in production. TURSO_* are set automatically by Vercel's Turso integration.
     client: {
       url: process.env.TURSO_DATABASE_URL || process.env.DATABASE_URI || 'file:./handworks.db',
-      authToken: process.env.TURSO_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN,
+      // The variable name depends on how the database was connected in Vercel; accept each one it uses.
+      authToken:
+        process.env.TURSO_AUTH_TOKEN ||
+        process.env.TURSO_DATABASE_TURSO_AUTH_TOKEN ||
+        process.env.DATABASE_AUTH_TOKEN,
     },
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
-  upload: { limits: { fileSize: 20_000_000 } },
+  // Vercel accepts uploads up to 4.5 MB per request; most phone photos fit, larger ones show a clear error.
+  upload: { limits: { fileSize: 4_400_000 } },
   sharp,
-  plugins: [
-    // Store uploads in Vercel Blob when deployed; on disk (./media) locally.
-    vercelBlobStorage({
-      enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
-      // Keep the database schema identical locally (no Blob) and live (Blob), so migrations match.
-      alwaysInsertFields: true,
-      collections: { media: true },
-      token: process.env.BLOB_READ_WRITE_TOKEN || '',
-      // Send uploads from the browser straight to Blob — Vercel limits server uploads to 4.5 MB.
-      clientUploads: true,
-    }),
-  ],
+  // Store uploads in Vercel Blob when deployed (BLOB_STORE_ID); on disk (./media) locally.
+  plugins: [vercelBlobStorage(['media'])],
 })
