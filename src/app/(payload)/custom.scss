@@ -1,0 +1,125 @@
+// Small warm touches so the admin feels like part of Handworks.
+.hw-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  &__img {
+    display: block;
+    width: min(320px, 80vw);
+    height: auto;
+  }
+  &__img--light {
+    display: none;
+  }
+  &__sub {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+}
+
+// Dark admin theme: swap to the paper-coloured logo.
+html[data-theme='dark'] .hw-logo__img--dark {
+  display: none;
+}
+html[data-theme='dark'] .hw-logo__img--light {
+  display: block;
+}
+
+.hw-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+html[data-theme='dark'] .hw-welcome {
+  background: color-mix(in srgb, #8c2a2e 16%, var(--theme-elevation-50));
+}
+
+.hw-welcome {
+  margin-bottom: 2.5rem;
+  padding: 1.75rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, #e9dcc3 55%, var(--theme-elevation-0));
+  border: 1px solid var(--theme-elevation-150);
+
+  &__eyebrow {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+  &__title {
+    margin: 0.4rem 0;
+    font-family: Georgia, serif;
+    font-weight: 400;
+  }
+  &__seed {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin: 0.75rem 0 1rem;
+    padding: 1rem 1.1rem;
+    border: 1px dashed #8c2a2e;
+    border-radius: 4px;
+    background: var(--theme-elevation-0);
+  }
+  &__seed-btn {
+    margin-left: auto;
+    padding: 0.6rem 1.1rem;
+    border: 0;
+    border-radius: 999px;
+    background: #8c2a2e;
+    color: #f4ecdd;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    &:hover {
+      background: #6e1f23;
+    }
+  }
+  &__lede {
+    margin: 0 0 1.25rem;
+    opacity: 0.85;
+  }
+  &__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 1rem 1.1rem;
+    border-radius: 4px;
+    background: var(--theme-elevation-0);
+    border: 1px solid var(--theme-elevation-150);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, transform 0.2s;
+    strong {
+      font-size: 1.05rem;
+    }
+    span {
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+    &:hover,
+    &:focus-visible {
+      border-color: #8c2a2e;
+      transform: translateY(-1px);
+    }
+  }
+}
